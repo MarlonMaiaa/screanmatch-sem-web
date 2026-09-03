@@ -3,13 +3,16 @@ package br.com.alura.screnmach.principal;
 import br.com.alura.screnmach.model.DadosEpisodio;
 import br.com.alura.screnmach.model.DadosSeries;
 import br.com.alura.screnmach.model.DadosTemporada;
+import br.com.alura.screnmach.model.Episodios;
 import br.com.alura.screnmach.service.ConsumoApi;
 import br.com.alura.screnmach.service.ConverteDados;
 import tools.jackson.databind.jsonFormatVisitors.JsonFormatVisitable;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Principal {
 
@@ -45,5 +48,28 @@ public class Principal {
 
         temporadas.forEach(t -> t.episodios().forEach
                 (e-> System.out.println(e.titulo())));
+
+
+        System.out.println("\nTop 5 melhores");
+       List <DadosEpisodio> dadosEpisodios = temporadas.stream()
+               .flatMap(t -> t.episodios().stream())
+               .collect(Collectors.toList());
+
+       dadosEpisodios.stream()
+               .filter(e -> !e.avaliacaoEpisodio().equalsIgnoreCase("N/A"))
+               .sorted(Comparator.comparing(DadosEpisodio::avaliacaoEpisodio).reversed())
+
+               .limit(5)
+               .forEach(System.out::println);
+
+        List<Episodios> episodios = temporadas.stream()
+                .flatMap(t -> t.episodios().stream()
+                        .map(d -> new Episodios(t.numero(), d))
+                ).collect(Collectors.toList());
+
+        episodios.forEach(System.out::println);
+
+
+
     }
 }
